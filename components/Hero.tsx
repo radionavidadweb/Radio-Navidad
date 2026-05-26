@@ -2,16 +2,16 @@
 
 import { motion } from "framer-motion";
 import { Play, CalendarDays, Sparkles } from "lucide-react";
-import Image from "next/image";
 import SoundWaves from "./SoundWaves";
 import Particles from "./Particles";
 import Player from "./Player";
+import AdsCarousel from "./AdsCarousel";
 
 export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28"
+      className="relative isolate overflow-hidden pt-24 pb-14 md:pt-32 md:pb-20"
     >
       {/* Ambient background */}
       <div className="hero-aurora absolute inset-0 -z-20" />
@@ -21,26 +21,20 @@ export default function Hero() {
 
       {/* Glow blobs */}
       <motion.div
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-        }}
+        animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -left-32 top-20 -z-10 h-[420px] w-[420px] rounded-full bg-brand-red/30 blur-[120px]"
       />
       <motion.div
-        animate={{
-          x: [0, -60, 0],
-          y: [0, 40, 0],
-        }}
+        animate={{ x: [0, -60, 0], y: [0, 40, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -right-32 top-60 -z-10 h-[460px] w-[460px] rounded-full bg-brand-redGlow/25 blur-[140px]"
       />
 
       <div className="relative mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-10">
-          {/* Left column — text */}
-          <div className="text-center lg:text-left">
+        <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-8">
+          {/* === LEFT COLUMN (7/12) — Text + CTAs + Carousel === */}
+          <div className="order-2 text-center lg:order-1 lg:col-span-7 lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -55,7 +49,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.1 }}
-              className="mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
+              className="mt-5 font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
             >
               <span className="text-gradient-soft">Radio </span>
               <span className="text-gradient-red">Navidad</span>
@@ -65,7 +59,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.2 }}
-              className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/70 md:text-xl lg:mx-0"
+              className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-white/70 md:text-xl lg:mx-0"
             >
               Música Cristiana en Cada Temporada.{" "}
               <span className="text-white/90">
@@ -78,7 +72,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.3 }}
-              className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 lg:items-start lg:justify-start"
+              className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 lg:items-start lg:justify-start"
             >
               <a href="#player" className="btn-primary group">
                 <Play className="h-5 w-5" fill="currentColor" />
@@ -90,56 +84,43 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            {/* Stats / trust */}
+            {/* Stats compactos inline */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4 }}
-              className="mt-10 grid max-w-md grid-cols-3 gap-4 lg:mx-0"
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs uppercase tracking-[0.2em] text-white/55 lg:justify-start"
             >
-              {[
-                { value: "24/7", label: "En vivo" },
-                { value: "+500", label: "Canciones" },
-                { value: "HD", label: "Streaming" },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 backdrop-blur"
-                >
-                  <div className="font-display text-2xl font-bold text-white">
-                    {s.value}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-wider text-white/55">
-                    {s.label}
-                  </div>
-                </div>
-              ))}
+              <span className="inline-flex items-center gap-2">
+                <span className="font-display text-base font-bold text-white">24/7</span>
+                En vivo
+              </span>
+              <span className="h-3 w-px bg-white/15" />
+              <span className="inline-flex items-center gap-2">
+                <span className="font-display text-base font-bold text-white">+500</span>
+                Canciones
+              </span>
+              <span className="h-3 w-px bg-white/15" />
+              <span className="inline-flex items-center gap-2">
+                <span className="font-display text-base font-bold text-white">HD</span>
+                Streaming
+              </span>
+            </motion.div>
+
+            {/* === Carrusel publicitario === */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.55 }}
+              className="mt-10"
+            >
+              <AdsCarousel />
             </motion.div>
           </div>
 
-          {/* Right column — Player */}
-          <div className="relative">
+          {/* === RIGHT COLUMN (5/12) — Player reducido === */}
+          <div className="order-1 lg:order-2 lg:col-span-5">
             <Player />
-
-            {/* Banner integrated subtly below the player */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.6 }}
-              className="mt-6 hidden overflow-hidden rounded-2xl border border-white/10 shadow-premium md:block"
-            >
-              <div className="relative aspect-[851/315]">
-                <Image
-                  src="/banner-radio-navidad.jpg"
-                  alt="Radio Navidad - Música Cristiana en Cada Temporada"
-                  fill
-                  sizes="(min-width: 768px) 600px, 100vw"
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-              </div>
-            </motion.div>
           </div>
         </div>
       </div>
@@ -149,7 +130,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center"
+        className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center"
       >
         <div className="flex h-10 w-6 items-start justify-center rounded-full border border-white/20 p-1">
           <motion.span

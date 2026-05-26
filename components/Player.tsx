@@ -81,7 +81,7 @@ export default function Player() {
       initial={{ opacity: 0, y: 30, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-      className="relative mx-auto w-full max-w-2xl"
+      className="relative mx-auto w-full max-w-md lg:max-w-none"
     >
       <audio
         ref={audioRef}
