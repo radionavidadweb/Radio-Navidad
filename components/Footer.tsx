@@ -110,7 +110,7 @@ export default function Footer() {
           </p>
           <p className="flex items-center gap-1.5">
             Hecho con <Heart className="h-3.5 w-3.5 text-brand-red" fill="currentColor" />{" "}
-            para glorificar Su nombre.
+            para glorificar Su nombre. · <a href="/admin" className="hover:text-brand-redGlow transition-colors">Administración</a>
           </p>
         </div>
       </div>

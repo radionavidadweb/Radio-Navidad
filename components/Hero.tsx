@@ -106,16 +106,6 @@ export default function Hero() {
                 Streaming
               </span>
             </motion.div>
-
-            {/* === Carrusel publicitario === */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.55 }}
-              className="mt-10"
-            >
-              <AdsCarousel />
-            </motion.div>
           </div>
 
           {/* === RIGHT COLUMN (5/12) — Player reducido === */}
@@ -124,6 +114,16 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      {/* === Carrusel publicitario de lado a lado === */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.55 }}
+        className="mt-14 w-full"
+      >
+        <AdsCarousel />
+      </motion.div>
 
       {/* Scroll cue */}
       <motion.div

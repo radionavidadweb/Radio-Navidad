@@ -1,8 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sun, Sunrise, Moon, Mic, Radio, Music } from "lucide-react";
 import SectionHeading from "./SectionHeading";
+
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  Sunrise,
+  Sun,
+  Music,
+  Mic,
+  Radio,
+  Moon,
+};
 
 const programs = [
   {
@@ -56,6 +66,19 @@ const programs = [
 ];
 
 export default function Schedule() {
+  const [scheduleList, setScheduleList] = useState<any[]>(programs);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("radio_navidad_schedule");
+    if (saved) {
+      try {
+        setScheduleList(JSON.parse(saved));
+      } catch (e) {
+        // Ignorar
+      }
+    }
+  }, []);
+
   return (
     <section id="schedule" className="relative py-24 md:py-32">
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -73,8 +96,8 @@ export default function Schedule() {
         />
 
         <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {programs.map((p, i) => {
-            const Icon = p.icon;
+          {scheduleList.map((p, i) => {
+            const Icon = typeof p.icon === "string" ? (ICON_MAP[p.icon] || Radio) : p.icon;
             return (
               <motion.article
                 key={p.title}

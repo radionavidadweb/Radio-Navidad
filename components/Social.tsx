@@ -1,42 +1,61 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Facebook, Youtube, Instagram } from "lucide-react";
 import SectionHeading from "./SectionHeading";
 
-const channels = [
+const SOCIAL_METADATA: Record<string, {
+  icon: any;
+  gradient: string;
+  border: string;
+}> = {
+  Facebook: {
+    icon: Facebook,
+    gradient: "from-blue-500/30 to-indigo-500/10",
+    border: "hover:border-blue-400/50",
+  },
+  YouTube: {
+    icon: Youtube,
+    gradient: "from-rose-500/30 to-brand-red/10",
+    border: "hover:border-rose-400/50",
+  },
+  Instagram: {
+    icon: Instagram,
+    gradient: "from-fuchsia-500/30 to-amber-400/10",
+    border: "hover:border-fuchsia-400/50",
+  },
+  WhatsApp: {
+    icon: null,
+    gradient: "from-emerald-500/30 to-green-400/10",
+    border: "hover:border-emerald-400/50",
+  },
+};
+
+const DEFAULT_SOCIAL_CHANNELS = [
   {
     name: "Facebook",
     handle: "@christmasradio",
     href: "https://facebook.com/christmasradio",
-    icon: Facebook,
-    gradient: "from-blue-500/30 to-indigo-500/10",
-    border: "hover:border-blue-400/50",
+    iconName: "Facebook",
   },
   {
     name: "YouTube",
     handle: "RadioNavidad",
     href: "https://youtube.com/@RadioNavidad",
-    icon: Youtube,
-    gradient: "from-rose-500/30 to-brand-red/10",
-    border: "hover:border-rose-400/50",
+    iconName: "YouTube",
   },
   {
     name: "Instagram",
     handle: "@radionavidad",
     href: "https://instagram.com/radionavidad",
-    icon: Instagram,
-    gradient: "from-fuchsia-500/30 to-amber-400/10",
-    border: "hover:border-fuchsia-400/50",
+    iconName: "Instagram",
   },
   {
     name: "WhatsApp",
     handle: "+1 (000) 000-0000",
     href: "https://wa.me/10000000000",
-    // Lucide doesn't ship WhatsApp; inline SVG below
-    icon: null,
-    gradient: "from-emerald-500/30 to-green-400/10",
-    border: "hover:border-emerald-400/50",
+    iconName: "WhatsApp",
   },
 ];
 
@@ -49,6 +68,19 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export default function Social() {
+  const [channels, setChannels] = useState<any[]>(DEFAULT_SOCIAL_CHANNELS);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("radio_navidad_social_links");
+    if (saved) {
+      try {
+        setChannels(JSON.parse(saved));
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
   return (
     <section id="social" className="relative py-24 md:py-32">
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -67,7 +99,8 @@ export default function Social() {
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {channels.map((c, i) => {
-            const Icon = c.icon;
+            const meta = SOCIAL_METADATA[c.iconName] || SOCIAL_METADATA["Facebook"];
+            const Icon = meta.icon;
             return (
               <motion.a
                 key={c.name}
@@ -83,10 +116,10 @@ export default function Social() {
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 whileHover={{ y: -6 }}
-                className={`group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-7 backdrop-blur-xl transition-all duration-500 ${c.border}`}
+                className={`group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-7 backdrop-blur-xl transition-all duration-500 ${meta.border}`}
               >
                 <div
-                  className={`pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br ${c.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+                  className={`pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br ${meta.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
                 />
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/15 transition-transform group-hover:scale-110">
                   {Icon ? (

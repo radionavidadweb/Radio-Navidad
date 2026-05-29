@@ -9,7 +9,7 @@ import MiniPlayer from "@/components/MiniPlayer";
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-hidden text-white">
+    <main className="relative min-h-screen w-full max-w-full overflow-hidden text-white">
       <Navbar />
       <Hero />
       <About />

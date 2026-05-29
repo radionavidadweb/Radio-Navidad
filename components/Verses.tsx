@@ -33,14 +33,29 @@ const verses = [
 ];
 
 export default function Verses() {
+  const [verseList, setVerseList] = useState(verses);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    const saved = localStorage.getItem("radio_navidad_verses");
+    if (saved) {
+      try {
+        setVerseList(JSON.parse(saved));
+      } catch (e) {
+        // Ignorar
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (verseList.length <= 1) return;
     const t = setInterval(() => {
-      setIndex((i) => (i + 1) % verses.length);
+      setIndex((i) => (i + 1) % verseList.length);
     }, 6000);
     return () => clearInterval(t);
-  }, []);
+  }, [verseList.length]);
+
+  const currentVerse = verseList[index] || { text: "El Señor es mi pastor, nada me faltará.", ref: "Salmos 23:1" };
 
   return (
     <section id="verses" className="relative overflow-hidden py-24 md:py-32">
@@ -77,10 +92,10 @@ export default function Verses() {
                   className="absolute inset-0 flex flex-col items-center justify-center"
                 >
                   <p className="font-display text-2xl font-medium leading-snug text-white md:text-3xl lg:text-4xl">
-                    “{verses[index].text}”
+                    “{currentVerse.text}”
                   </p>
                   <p className="mt-6 text-sm font-semibold uppercase tracking-[0.3em] text-brand-redGlow">
-                    {verses[index].ref}
+                    {currentVerse.ref}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -88,7 +103,7 @@ export default function Verses() {
 
             {/* Dot indicators */}
             <div className="mt-10 flex justify-center gap-2">
-              {verses.map((_, i) => (
+              {verseList.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setIndex(i)}

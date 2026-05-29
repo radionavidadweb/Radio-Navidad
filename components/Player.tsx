@@ -9,8 +9,6 @@ import {
   VolumeX,
   Heart,
   Share2,
-  SkipBack,
-  SkipForward,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -38,17 +36,33 @@ export default function Player() {
   const [loading, setLoading] = useState(false);
   const [liked, setLiked] = useState(false);
   const [trackIndex, setTrackIndex] = useState(0);
+  const [streamUrl, setStreamUrl] = useState(STREAM_URL);
+  const [tracks, setTracks] = useState<Track[]>(ROTATING_TRACKS);
 
-  const currentTrack = ROTATING_TRACKS[trackIndex];
+  const currentTrack = tracks[trackIndex] || { title: "Cargando...", artist: "Radio Navidad" };
+
+  // Cargar configuraciones del localStorage al montar
+  useEffect(() => {
+    const savedStream = localStorage.getItem("radio_navidad_stream_url");
+    const savedTracks = localStorage.getItem("radio_navidad_tracks");
+    if (savedStream) setStreamUrl(savedStream);
+    if (savedTracks) {
+      try {
+        setTracks(JSON.parse(savedTracks));
+      } catch (e) {
+        // Ignorar errores de parseo
+      }
+    }
+  }, []);
 
   // Rotate fake "now playing" every 18s when playing
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || tracks.length <= 1) return;
     const t = setInterval(() => {
-      setTrackIndex((i) => (i + 1) % ROTATING_TRACKS.length);
+      setTrackIndex((i) => (i + 1) % tracks.length);
     }, 18000);
     return () => clearInterval(t);
-  }, [playing]);
+  }, [playing, tracks.length]);
 
   // Volume sync
   useEffect(() => {
@@ -81,11 +95,11 @@ export default function Player() {
       initial={{ opacity: 0, y: 30, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-      className="relative mx-auto w-full max-w-md lg:max-w-none"
+      className="relative mx-auto w-full max-w-[340px] md:max-w-md lg:max-w-none"
     >
       <audio
         ref={audioRef}
-        src={STREAM_URL}
+        src={streamUrl}
         preload="none"
         crossOrigin="anonymous"
       />
@@ -93,23 +107,23 @@ export default function Player() {
       {/* Glow halo */}
       <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-br from-brand-red/40 via-brand-redGlow/20 to-transparent blur-3xl" />
 
-      <div className="glass-strong relative overflow-hidden rounded-[2rem] p-6 shadow-premium md:p-8">
-        {/* Live badge */}
-        <div className="mb-5 flex items-center justify-between">
+      <div className="glass-strong relative overflow-hidden rounded-[2rem] p-4 md:p-6 shadow-premium">
+        {/* Live badge (Desktop only) */}
+        <div className="hidden md:flex mb-4 items-center justify-between">
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-red/40 bg-brand-red/15 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
             <span className="live-dot" />
             En Vivo
           </div>
-          <div className="hidden items-center gap-1.5 text-xs text-white/55 md:flex">
+          <div className="flex items-center gap-1.5 text-xs text-white/55">
             <span>FM 98.7</span>
             <span className="h-1 w-1 rounded-full bg-white/30" />
             <span>Stream HD · 320kbps</span>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-6 md:flex-row md:items-stretch">
+        <div className="flex flex-row items-center gap-3 md:gap-4 md:items-stretch">
           {/* Cover with equalizer overlay */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <motion.div
               animate={
                 playing
@@ -121,24 +135,24 @@ export default function Player() {
                 repeat: playing ? Infinity : 0,
                 ease: "linear",
               }}
-              className="relative h-32 w-32 overflow-hidden rounded-2xl ring-1 ring-white/15 md:h-36 md:w-36"
+              className="relative h-16 w-16 overflow-hidden rounded-xl ring-1 ring-white/15 md:h-28 md:w-28"
             >
               <Image
                 src="/logo-radio-navidad.jpg"
                 alt="Radio Navidad"
                 fill
-                sizes="144px"
+                sizes="112px"
                 className="object-cover"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-brand-redDark/30 via-transparent to-transparent" />
             </motion.div>
-            {/* Equalizer */}
-            <div className="absolute -bottom-3 left-1/2 flex h-9 -translate-x-1/2 items-end rounded-full bg-black/70 px-3 backdrop-blur">
+            {/* Equalizer (Desktop only) */}
+            <div className="absolute -bottom-2 left-1/2 hidden md:flex h-8 -translate-x-1/2 items-end rounded-full bg-black/70 px-2.5 backdrop-blur">
               {[0, 1, 2, 3, 4, 5, 6].map((i) => (
                 <span
                   key={i}
-                  className="eq-bar h-6"
+                  className="eq-bar h-5"
                   style={{
                     animationDelay: `${i * 0.12}s`,
                     animationPlayState: playing ? "running" : "paused",
@@ -150,10 +164,11 @@ export default function Player() {
           </div>
 
           {/* Track info + visualizer */}
-          <div className="flex flex-1 flex-col justify-between">
-            <div className="text-center md:text-left">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-brand-redGlow">
-                Reproduciendo ahora
+          <div className="flex flex-1 flex-col justify-center md:justify-between min-w-0">
+            <div className="text-left">
+              <div className="flex items-center gap-2 text-[11px] md:text-xs font-semibold uppercase tracking-[0.25em] text-white">
+                <span>Reproduciendo ahora</span>
+                <span className="flex h-1.5 w-1.5 rounded-full bg-brand-redGlow animate-pulse md:hidden" />
               </div>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -162,18 +177,18 @@ export default function Player() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.35 }}
-                  className="mt-1"
+                  className="mt-0.5 md:mt-1 min-w-0"
                 >
-                  <h3 className="font-display text-xl font-bold text-white md:text-2xl">
+                  <h3 className="font-display text-base md:text-xl font-bold text-white truncate">
                     {currentTrack.title}
                   </h3>
-                  <p className="text-sm text-white/65">{currentTrack.artist}</p>
+                  <p className="text-xs md:text-sm text-white/65 truncate">{currentTrack.artist}</p>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Audio visualizer (decorative) */}
-            <div className="mt-4 flex h-8 items-end justify-center gap-0.5 md:justify-start">
+            {/* Audio visualizer (Desktop only) */}
+            <div className="hidden md:flex mt-3 h-6 items-end justify-start gap-0.5">
               {Array.from({ length: 32 }).map((_, i) => (
                 <motion.span
                   key={i}
@@ -202,59 +217,67 @@ export default function Player() {
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="mt-6 flex items-center justify-center gap-4">
-          <button
-            onClick={() =>
-              setTrackIndex(
-                (i) => (i - 1 + ROTATING_TRACKS.length) % ROTATING_TRACKS.length
-              )
-            }
-            className="rounded-full p-3 text-white/70 transition hover:bg-white/10 hover:text-white"
-            aria-label="Anterior"
-          >
-            <SkipBack className="h-5 w-5" />
-          </button>
-
+        {/* Large Controls (Desktop only) */}
+        <div className="hidden md:flex mt-4 items-center justify-center">
           <motion.button
             whileTap={{ scale: 0.92 }}
             whileHover={{ scale: 1.06 }}
             onClick={togglePlay}
             disabled={loading}
-            className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-redGlow via-brand-red to-brand-redDark text-white shadow-glow md:h-20 md:w-20"
+            className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-redGlow via-brand-red to-brand-redDark text-white shadow-glow md:h-16 md:w-16"
             aria-label={playing ? "Pausar" : "Reproducir"}
           >
             <span className="absolute inset-0 animate-pulse-soft rounded-full bg-brand-red/40 blur-xl" />
+            {playing && (
+              <span className="absolute inset-0 animate-ping rounded-full bg-brand-redGlow/40 opacity-75" />
+            )}
             {loading ? (
-              <span className="relative h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              <span className="relative h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
             ) : playing ? (
-              <Pause className="relative h-7 w-7 md:h-9 md:w-9" fill="currentColor" />
+              <Pause className="relative h-6 w-6 md:h-8 md:w-8" fill="currentColor" />
             ) : (
-              <Play className="relative ml-1 h-7 w-7 md:h-9 md:w-9" fill="currentColor" />
+              <Play className="relative ml-0.5 h-6 w-6 md:h-8 md:w-8" fill="currentColor" />
             )}
           </motion.button>
-
-          <button
-            onClick={() => setTrackIndex((i) => (i + 1) % ROTATING_TRACKS.length)}
-            className="rounded-full p-3 text-white/70 transition hover:bg-white/10 hover:text-white"
-            aria-label="Siguiente"
-          >
-            <SkipForward className="h-5 w-5" />
-          </button>
         </div>
 
-        {/* Bottom row: volume + actions */}
-        <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <div className="flex w-full max-w-[260px] items-center gap-3">
+        {/* Bottom row: volume + mobile controls + desktop-only actions */}
+        <div className="mt-3 md:mt-4 pt-3 md:pt-0 border-t border-white/5 md:border-none flex items-center w-full md:justify-between">
+          
+          {/* Column 1 (30%): Play button (mobile only) centered */}
+          <div className="w-[30%] flex md:hidden items-center justify-center shrink-0">
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={togglePlay}
+              disabled={loading}
+              className="relative flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-brand-redGlow via-brand-red to-brand-redDark text-white shadow-glow"
+              aria-label={playing ? "Pausar" : "Reproducir"}
+            >
+              <span className="absolute inset-0 animate-pulse-soft rounded-full bg-brand-red/40 blur-lg" />
+              {playing && (
+                <span className="absolute inset-0 animate-ping rounded-full bg-brand-redGlow/40 opacity-75" />
+              )}
+              {loading ? (
+                <span className="relative h-4 w-4 animate-spin rounded-full border border-white/40 border-t-white" />
+              ) : playing ? (
+                <Pause className="relative h-5 w-5" fill="currentColor" />
+              ) : (
+                <Play className="relative ml-0.5 h-5 w-5" fill="currentColor" />
+              )}
+            </motion.button>
+          </div>
+
+          {/* Column 2 (70%): Volume slider (aligned left on mobile, normal flow on desktop) */}
+          <div className="w-[70%] flex md:w-auto md:max-w-[240px] md:flex-1 items-center justify-start gap-2 min-w-0">
             <button
               onClick={() => setMuted(!muted)}
-              className="rounded-full p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+              className="rounded-full p-1.5 text-white/70 transition hover:bg-white/10 hover:text-white"
               aria-label="Mute"
             >
               {muted || volume === 0 ? (
-                <VolumeX className="h-5 w-5" />
+                <VolumeX className="h-4.5 w-4.5 md:h-5 md:w-5" />
               ) : (
-                <Volume2 className="h-5 w-5" />
+                <Volume2 className="h-4.5 w-4.5 md:h-5 md:w-5" />
               )}
             </button>
             <input
@@ -267,7 +290,7 @@ export default function Player() {
                 setVolume(parseFloat(e.target.value));
                 setMuted(false);
               }}
-              className="volume-slider flex-1"
+              className="volume-slider flex-1 w-full min-w-0"
               aria-label="Volumen"
               style={{
                 background: `linear-gradient(to right, #d90429 ${
@@ -277,10 +300,11 @@ export default function Player() {
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Desktop-only Actions (Heart & Share) */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
             <button
               onClick={() => setLiked(!liked)}
-              className={`rounded-full p-2.5 transition ${
+              className={`rounded-full p-2 transition ${
                 liked
                   ? "bg-brand-red/20 text-brand-redGlow"
                   : "text-white/70 hover:bg-white/10 hover:text-white"
@@ -304,12 +328,13 @@ export default function Player() {
                     .catch(() => {});
                 }
               }}
-              className="rounded-full p-2.5 text-white/70 transition hover:bg-white/10 hover:text-white"
+              className="rounded-full p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
               aria-label="Compartir"
             >
               <Share2 className="h-5 w-5" />
             </button>
           </div>
+
         </div>
       </div>
     </motion.div>
