@@ -4,8 +4,8 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
-    const expectedUser = process.env.USUARIO_ADMINISTRADOR;
-    const expectedPassword = process.env.CONTRASEÑA_DE_ADMINISTRADOR;
+    const expectedUser = process.env.ADMIN_USER;
+    const expectedPassword = process.env.ADMIN_PASSWORD;
 
     if (!expectedUser || !expectedPassword) {
       return NextResponse.json(
