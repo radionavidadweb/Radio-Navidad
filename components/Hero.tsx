@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Play, CalendarDays, Sparkles } from "lucide-react";
+import { Play, CalendarDays } from "lucide-react";
 import SoundWaves from "./SoundWaves";
 import Particles from "./Particles";
 import Player from "./Player";
@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate overflow-hidden pt-24 pb-14 md:pt-32 md:pb-20"
+      className="relative isolate overflow-hidden pt-20 pb-6 md:pt-24 md:pb-10"
     >
       {/* Ambient background */}
       <div className="hero-aurora absolute inset-0 -z-20" />
@@ -35,16 +35,6 @@ export default function Hero() {
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-8">
           {/* === LEFT COLUMN (7/12) — Text + CTAs + Carousel === */}
           <div className="order-2 text-center lg:order-1 lg:col-span-7 lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-white/70 backdrop-blur"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-brand-redGlow" />
-              Emisora cristiana premium · 24/7
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -61,11 +51,11 @@ export default function Hero() {
               transition={{ duration: 0.9, delay: 0.2 }}
               className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-white/70 md:text-xl lg:mx-0"
             >
-              Música Cristiana en Cada Temporada.{" "}
+              Música Cristiana durante todo el año.{" "}
               <span className="text-white/90">
-                Una experiencia sonora de paz, esperanza y alabanza
+                En Emisora Radio Navidad vivimos la fe y la esperanza con la mejor música cristiana, y en temporada navideña disfrutamos los mejores éxitos de Navidad.
               </span>{" "}
-              transmitiendo en vivo, todos los días del año.
+              Tu mejor estación para acompañarte cada día.
             </motion.p>
 
             <motion.div
@@ -84,28 +74,6 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            {/* Stats compactos inline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs uppercase tracking-[0.2em] text-white/55 lg:justify-start"
-            >
-              <span className="inline-flex items-center gap-2">
-                <span className="font-display text-base font-bold text-white">24/7</span>
-                En vivo
-              </span>
-              <span className="h-3 w-px bg-white/15" />
-              <span className="inline-flex items-center gap-2">
-                <span className="font-display text-base font-bold text-white">+500</span>
-                Canciones
-              </span>
-              <span className="h-3 w-px bg-white/15" />
-              <span className="inline-flex items-center gap-2">
-                <span className="font-display text-base font-bold text-white">HD</span>
-                Streaming
-              </span>
-            </motion.div>
           </div>
 
           {/* === RIGHT COLUMN (5/12) — Player reducido === */}
@@ -120,7 +88,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.55 }}
-        className="mt-14 w-full"
+        className="mt-6 w-full"
       >
         <AdsCarousel />
       </motion.div>

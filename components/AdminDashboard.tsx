@@ -257,69 +257,43 @@ export default function AdminDashboard() {
   };
 
   // Elimina un archivo subido del servidor Next.js
-  const deleteServerFile = async (url: string) => {
-    try {
-      await fetch("/api/admin/upload", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-    } catch (e) {
-      console.error("Error al eliminar archivo del servidor:", e);
-    }
-  };
-
-  // Sube el archivo de imagen seleccionado a public/uploads
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Convierte la imagen a base64 y la guarda en el estado (sin servidor)
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al subir archivo");
-      }
-
-      const data = await res.json();
-
-      // Si ya había una imagen temporal cargada en el formulario (y no guardada), la borramos del servidor
-      if (slideImage && slideImage.startsWith("/uploads/")) {
-        const isUsed = slides.some((s, idx) => s.image === slideImage && idx !== editingIndex);
-        if (!isUsed) {
-          await deleteServerFile(slideImage);
-        }
-      }
-
-      setSlideImage(data.url);
-      showNotification("Imagen subida con éxito");
-    } catch (err) {
-      showNotification("Error al subir la imagen", "error");
-    } finally {
-      setUploading(false);
+    const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!ALLOWED.includes(file.type)) {
+      showNotification("Formato no soportado. Usá PNG, JPG, WEBP o GIF", "error");
+      return;
     }
+
+    if (file.size > 1 * 1024 * 1024) {
+      showNotification("La imagen supera 1 MB. Comprimila antes de subirla", "error");
+      return;
+    }
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setSlideImage(ev.target?.result as string);
+      showNotification("Imagen cargada con éxito");
+      setUploading(false);
+    };
+    reader.onerror = () => {
+      showNotification("Error al leer la imagen", "error");
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
-  // Quita la imagen cargada en el formulario (y limpia del servidor si era temporal)
-  const removeUploadedImage = async () => {
-    if (slideImage && slideImage.startsWith("/uploads/")) {
-      const isUsed = slides.some((s, idx) => s.image === slideImage && idx !== editingIndex);
-      if (!isUsed) {
-        await deleteServerFile(slideImage);
-      }
-    }
+  // Quita la imagen del formulario (se guarda en localStorage, no hay archivo en servidor)
+  const removeUploadedImage = () => {
     setSlideImage("");
   };
 
   // Acciones para Anuncios (Slides)
-  const addOrUpdateSlide = async () => {
+  const addOrUpdateSlide = () => {
     if (!slideTitle && !slideImage) {
       showNotification("Ingresá al menos un título o subí una imagen para crear el anuncio", "error");
       return;
@@ -334,18 +308,14 @@ export default function AdminDashboard() {
       image: slideImage,
     };
     if (editingIndex !== null) {
-      const oldSlide = slides[editingIndex];
-      // Si la imagen anterior era del servidor y cambió, la eliminamos para no dejar basura
-      if (oldSlide.image && oldSlide.image.startsWith("/uploads/") && oldSlide.image !== slideImage) {
-        const isUsed = slides.some((s, idx) => s.image === oldSlide.image && idx !== editingIndex);
-        if (!isUsed) {
-          await deleteServerFile(oldSlide.image);
-        }
-      }
       updated[editingIndex] = newSlide;
       setEditingIndex(null);
       showNotification("Anuncio actualizado");
     } else {
+      if (slides.length >= 7) {
+        showNotification("El carrusel soporta máximo 7 anuncios", "error");
+        return;
+      }
       updated.push(newSlide);
       showNotification("Anuncio agregado");
     }
@@ -359,15 +329,7 @@ export default function AdminDashboard() {
     setSlideImage("");
   };
 
-  const deleteSlide = async (idx: number) => {
-    const slide = slides[idx];
-    // Si tiene una imagen local subida, la eliminamos del servidor
-    if (slide.image && slide.image.startsWith("/uploads/")) {
-      const isUsed = slides.some((s, i) => s.image === slide.image && i !== idx);
-      if (!isUsed) {
-        await deleteServerFile(slide.image);
-      }
-    }
+  const deleteSlide = (idx: number) => {
     const updated = slides.filter((_, i) => i !== idx);
     setSlides(updated);
     localStorage.setItem("radio_navidad_slides", JSON.stringify(updated));
@@ -469,15 +431,7 @@ export default function AdminDashboard() {
     setProgIcon(programs[idx].icon || "Radio");
   };
 
-  const resetForm = async () => {
-    // Si había una imagen temporal subida que no fue guardada en ningún anuncio, la limpiamos del servidor
-    if (slideImage && slideImage.startsWith("/uploads/")) {
-      const isUsed = slides.some((s, idx) => s.image === slideImage && idx !== editingIndex);
-      if (!isUsed) {
-        await deleteServerFile(slideImage);
-      }
-    }
-
+  const resetForm = () => {
     setEditingIndex(null);
     setSlideTitle("");
     setSlideSubtitle("");
@@ -908,7 +862,7 @@ export default function AdminDashboard() {
                       <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/15 bg-white/5 p-6 text-center transition hover:border-brand-red/40 hover:bg-white/[0.08] cursor-pointer group">
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
                           onChange={handleImageUpload}
                           disabled={uploading}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -924,7 +878,7 @@ export default function AdminDashboard() {
                               <Plus className="h-5 w-5" />
                             </div>
                             <p className="text-xs font-semibold text-white/70">Subir imagen</p>
-                            <p className="text-[10px] text-white/40">Soporta PNG, JPG, WEBP o GIF (Recomendado 16:9)</p>
+                            <p className="text-[10px] text-white/40">PNG, JPG, WEBP o GIF · Máx. 1 MB (Recomendado 16:9)</p>
                           </div>
                         )}
                       </div>
@@ -957,7 +911,7 @@ export default function AdminDashboard() {
                     <p className="text-[10px] text-white/45 leading-relaxed bg-white/[0.01] border border-white/5 rounded-xl p-3 flex items-start gap-2">
                       <span className="text-xs text-brand-redGlow">💡</span>
                       <span>
-                        <strong className="text-white/60">Sugerencia técnica:</strong> Para que encaje perfecta sin cortes extraños, usá imágenes en formato <strong className="text-white/60">16:9</strong> (resolución recomendada: <strong className="text-white/60">1280x720</strong> o <strong className="text-white/60">960x540 px</strong>). Procurá que pesen menos de <strong className="text-white/60">200 KB</strong> (WebP o JPG optimizado) para mantener la velocidad de carga de la web.
+                        <strong className="text-white/60">Sugerencia técnica:</strong> Usá imágenes en formato <strong className="text-white/60">16:9</strong> (resolución recomendada: <strong className="text-white/60">1280x720</strong> o <strong className="text-white/60">960x540 px</strong>). La imagen se guarda en el navegador, por eso el archivo debe pesar menos de <strong className="text-white/60">1 MB</strong> (preferí WebP o JPG optimizado).
                       </span>
                     </p>
                   </div>

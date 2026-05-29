@@ -96,6 +96,12 @@ const DEFAULT_SLIDES = [
 
 const SPEED = 32; // pixels/segundo - velocidad del auto-scroll
 
+const today = new Date().toLocaleDateString("es-ES", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
 export default function AdsCarousel() {
   const [slides, setSlides] = useState<typeof DEFAULT_SLIDES>(DEFAULT_SLIDES);
   const x = useMotionValue(0);
@@ -172,6 +178,7 @@ export default function AdsCarousel() {
               <motion.div
                 key={`${s.title}-${i}`}
                 whileHover={{ scale: 1.025, y: -4 }}
+                whileTap={{ scale: 0.96, y: 3 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className={`group relative aspect-[16/9] w-[290px] shrink-0 overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-gradient-to-br ${s.gradient} shadow-glowSoft ring-1 ring-white/15 sm:w-[500px] md:w-[540px]`}
               >
@@ -249,6 +256,9 @@ export default function AdsCarousel() {
                           {s.subtitle}
                         </p>
                       )}
+                      <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.15em] text-white/50 sm:text-xs">
+                        {today}
+                      </p>
                     </div>
                   )}
                 </div>
