@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
@@ -14,7 +14,14 @@ const display = Space_Grotesk({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#d90429",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
+  ),
   title: "Radio Navidad · Música Cristiana en Cada Temporada",
   description:
     "Radio Navidad — Emisora cristiana en vivo. Alabanza, adoración, reflexión y esperanza las 24 horas del día. Música cristiana premium para tu corazón.",
@@ -42,7 +49,6 @@ export const metadata: Metadata = {
     description: "Música Cristiana en Cada Temporada — En vivo 24/7",
     images: ["/banner-radio-navidad.jpg"],
   },
-  themeColor: "#d90429",
 };
 
 export default function RootLayout({
