@@ -187,65 +187,14 @@ export default function Player() {
               </AnimatePresence>
             </div>
 
-            {/* Audio visualizer (Desktop only) */}
-            <div className="hidden md:flex mt-3 h-6 items-end justify-start gap-0.5">
-              {Array.from({ length: 32 }).map((_, i) => (
-                <motion.span
-                  key={i}
-                  className="w-1 rounded-full bg-gradient-to-t from-brand-redDark via-brand-red to-brand-redGlow"
-                  animate={
-                    playing
-                      ? {
-                          height: [
-                            `${Math.random() * 60 + 10}%`,
-                            `${Math.random() * 90 + 10}%`,
-                            `${Math.random() * 40 + 10}%`,
-                          ],
-                        }
-                      : { height: "12%" }
-                  }
-                  transition={{
-                    duration: 0.9 + Math.random() * 0.6,
-                    repeat: playing ? Infinity : 0,
-                    repeatType: "reverse",
-                    delay: i * 0.04,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
-        {/* Large Controls (Desktop only) */}
-        <div className="hidden md:flex mt-4 items-center justify-center">
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            whileHover={{ scale: 1.06 }}
-            onClick={togglePlay}
-            disabled={loading}
-            className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-redGlow via-brand-red to-brand-redDark text-white shadow-glow md:h-16 md:w-16"
-            aria-label={playing ? "Pausar" : "Reproducir"}
-          >
-            <span className="absolute inset-0 animate-pulse-soft rounded-full bg-brand-red/40 blur-xl" />
-            {playing && (
-              <span className="absolute inset-0 animate-ping rounded-full bg-brand-redGlow/40 opacity-75" />
-            )}
-            {loading ? (
-              <span className="relative h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            ) : playing ? (
-              <Pause className="relative h-6 w-6 md:h-8 md:w-8" fill="currentColor" />
-            ) : (
-              <Play className="relative ml-0.5 h-6 w-6 md:h-8 md:w-8" fill="currentColor" />
-            )}
-          </motion.button>
-        </div>
-
-        {/* Bottom row: volume + mobile controls + desktop-only actions */}
-        <div className="mt-3 md:mt-4 pt-3 md:pt-0 border-t border-white/5 md:border-none flex items-center w-full md:justify-between">
+        {/* Bottom row: volume + controls + actions */}
+        <div className="mt-3 pt-3 border-t border-white/5 flex items-center w-full justify-between">
           
-          {/* Column 1 (30%): Play button (mobile only) centered */}
-          <div className="w-[30%] flex md:hidden items-center justify-center shrink-0">
+          {/* Column 1 (30%): Play button centered */}
+          <div className="w-[30%] flex items-center justify-center shrink-0">
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={togglePlay}
@@ -300,8 +249,8 @@ export default function Player() {
             />
           </div>
 
-          {/* Desktop-only Actions (Heart & Share) */}
-          <div className="hidden md:flex items-center gap-2 shrink-0">
+          {/* Actions (Heart & Share) */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setLiked(!liked)}
               className={`rounded-full p-2 transition ${
