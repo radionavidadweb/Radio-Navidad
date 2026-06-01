@@ -6,11 +6,11 @@ import { Menu, X, Radio } from "lucide-react";
 import Image from "next/image";
 
 const links = [
-  { label: "Inicio", href: "#hero" },
-  { label: "Nosotros", href: "#about" },
-  { label: "Programación", href: "#schedule" },
-  { label: "Versículos", href: "#verses" },
-  { label: "Contacto", href: "#social" },
+  { label: "Inicio", href: "#inicio" },
+  { label: "Nosotros", href: "#nosotros" },
+  { label: "Programación", href: "#programacion" },
+  { label: "Versículos", href: "#versiculos" },
+  { label: "Contacto", href: "#contacto" },
 ];
 
 export default function Navbar() {
@@ -37,7 +37,7 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
         {/* Logo */}
-        <a href="#hero" className="group flex items-center gap-3">
+        <a href="/" className="group flex items-center gap-3">
           <div className="relative h-11 w-11 overflow-hidden rounded-full ring-2 ring-brand-red/40 shadow-glow transition-transform group-hover:scale-105">
             <Image
               src="/logo-radio-navidad.jpg"
@@ -73,13 +73,16 @@ export default function Navbar() {
         </ul>
 
         {/* CTA */}
-        <a
-          href="#player"
+        <button
+          onClick={() => {
+            document.getElementById("reproductor")?.scrollIntoView({ behavior: "smooth" });
+            window.dispatchEvent(new CustomEvent("radio-play"));
+          }}
           className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all hover:scale-[1.03] md:inline-flex"
         >
           <Radio className="h-4 w-4" />
           Escuchar Ahora
-        </a>
+        </button>
 
         {/* Mobile toggle */}
         <button
@@ -116,7 +119,7 @@ export default function Navbar() {
                 ))}
               </ul>
               <a
-                href="#player"
+                href="#reproductor"
                 onClick={() => setOpen(false)}
                 className="mt-3 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red px-5 py-3 text-sm font-semibold text-white shadow-glow"
               >

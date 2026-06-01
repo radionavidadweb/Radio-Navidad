@@ -71,6 +71,24 @@ export default function Player() {
     }
   }, [volume, muted]);
 
+  // Escuchar evento global "radio-play" (botón Escuchar Ahora del navbar)
+  useEffect(() => {
+    const handler = async () => {
+      if (!audioRef.current || playing) return;
+      try {
+        setLoading(true);
+        await audioRef.current.play();
+        setPlaying(true);
+      } catch {
+        // ignore autoplay policy errors
+      } finally {
+        setLoading(false);
+      }
+    };
+    window.addEventListener("radio-play", handler);
+    return () => window.removeEventListener("radio-play", handler);
+  }, [playing]);
+
   const togglePlay = async () => {
     if (!audioRef.current) return;
     try {
@@ -91,7 +109,7 @@ export default function Player() {
 
   return (
     <motion.div
-      id="player"
+      id="reproductor"
       initial={{ opacity: 0, y: 30, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}

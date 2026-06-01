@@ -18,7 +18,7 @@ export default function MiniPlayer() {
     <AnimatePresence>
       {visible && (
         <motion.a
-          href="#player"
+          href="#reproductor"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}

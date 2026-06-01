@@ -33,7 +33,7 @@ const features = [
 
 export default function About() {
   return (
-    <section id="about" className="relative py-24 md:py-32">
+    <section id="nosotros" className="relative py-24 md:py-32">
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-5 md:px-8">

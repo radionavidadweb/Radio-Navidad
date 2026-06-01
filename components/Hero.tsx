@@ -10,7 +10,7 @@ import AdsCarousel from "./AdsCarousel";
 export default function Hero() {
   return (
     <section
-      id="hero"
+      id="inicio"
       className="relative isolate overflow-hidden pt-20 pb-6 md:pt-24 md:pb-10"
     >
       {/* Ambient background */}
@@ -110,11 +110,11 @@ export default function Hero() {
         transition={{ duration: 0.8, delay: 0.7 }}
         className="mx-auto mt-6 flex flex-col items-center gap-3 px-5 sm:flex-row sm:justify-center sm:gap-4 md:px-8"
       >
-        <a href="#player" className="btn-primary group">
+        <a href="#reproductor" className="btn-primary group">
           <Play className="h-5 w-5" fill="currentColor" />
           Escuchar En Vivo
         </a>
-        <a href="#schedule" className="btn-ghost">
+        <a href="#programacion" className="btn-ghost">
           <CalendarDays className="h-5 w-5" />
           Ver Programación
         </a>

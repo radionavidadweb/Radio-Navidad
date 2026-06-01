@@ -58,7 +58,7 @@ export default function Verses() {
   const currentVerse = verseList[index] || { text: "El Señor es mi pastor, nada me faltará.", ref: "Salmos 23:1" };
 
   return (
-    <section id="verses" className="relative overflow-hidden py-24 md:py-32">
+    <section id="versiculos" className="relative overflow-hidden py-24 md:py-32">
       {/* Decorative gradient orbs */}
       <div className="pointer-events-none absolute -left-20 top-1/3 -z-10 h-72 w-72 rounded-full bg-brand-red/20 blur-[100px]" />
       <div className="pointer-events-none absolute -right-20 bottom-1/4 -z-10 h-72 w-72 rounded-full bg-brand-redGlow/15 blur-[100px]" />
