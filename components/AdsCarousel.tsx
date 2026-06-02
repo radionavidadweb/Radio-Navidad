@@ -102,24 +102,16 @@ const today = new Date().toLocaleDateString("es-ES", {
   month: "long",
 });
 
-export default function AdsCarousel() {
-  const [slides, setSlides] = useState<typeof DEFAULT_SLIDES>(DEFAULT_SLIDES);
+interface AdsCarouselProps {
+  slides?: typeof DEFAULT_SLIDES;
+}
+
+export default function AdsCarousel({ slides: slidesProp }: AdsCarouselProps) {
+  const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_SLIDES;
   const x = useMotionValue(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   const [halfWidth, setHalfWidth] = useState(0);
-
-  // Cargar anuncios de localStorage si existen
-  useEffect(() => {
-    const savedSlides = localStorage.getItem("radio_navidad_slides");
-    if (savedSlides) {
-      try {
-        setSlides(JSON.parse(savedSlides));
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, []);
 
   // Medir ancho real (mitad porque duplicamos slides para loop infinito)
   useEffect(() => {

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sun, Sunrise, Moon, Mic, Radio, Music } from "lucide-react";
 import SectionHeading from "./SectionHeading";
@@ -65,19 +64,12 @@ const programs = [
   },
 ];
 
-export default function Schedule() {
-  const [scheduleList, setScheduleList] = useState<any[]>(programs);
+interface ScheduleProps {
+  programs?: any[];
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem("radio_navidad_schedule");
-    if (saved) {
-      try {
-        setScheduleList(JSON.parse(saved));
-      } catch (e) {
-        // Ignorar
-      }
-    }
-  }, []);
+export default function Schedule({ programs: programsProp }: ScheduleProps) {
+  const scheduleList = programsProp && programsProp.length > 0 ? programsProp : programs;
 
   return (
     <section id="programacion" className="relative py-24 md:py-32">

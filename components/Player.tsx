@@ -28,7 +28,11 @@ const ROTATING_TRACKS: Track[] = [
   { title: "Aleluya (Tu Presencia)", artist: "Miel San Marcos" },
 ];
 
-export default function Player() {
+interface PlayerProps {
+  streamUrl?: string;
+}
+
+export default function Player({ streamUrl }: PlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
@@ -36,24 +40,10 @@ export default function Player() {
   const [loading, setLoading] = useState(false);
   const [liked, setLiked] = useState(false);
   const [trackIndex, setTrackIndex] = useState(0);
-  const [streamUrl, setStreamUrl] = useState(STREAM_URL);
   const [tracks, setTracks] = useState<Track[]>(ROTATING_TRACKS);
 
+  const activeStreamUrl = streamUrl || STREAM_URL;
   const currentTrack = tracks[trackIndex] || { title: "Cargando...", artist: "Radio Navidad" };
-
-  // Cargar configuraciones del localStorage al montar
-  useEffect(() => {
-    const savedStream = localStorage.getItem("radio_navidad_stream_url");
-    const savedTracks = localStorage.getItem("radio_navidad_tracks");
-    if (savedStream) setStreamUrl(savedStream);
-    if (savedTracks) {
-      try {
-        setTracks(JSON.parse(savedTracks));
-      } catch (e) {
-        // Ignorar errores de parseo
-      }
-    }
-  }, []);
 
   // Rotate fake "now playing" every 18s when playing
   useEffect(() => {
@@ -117,7 +107,7 @@ export default function Player() {
     >
       <audio
         ref={audioRef}
-        src={streamUrl}
+        src={activeStreamUrl}
         preload="none"
         crossOrigin="anonymous"
       />

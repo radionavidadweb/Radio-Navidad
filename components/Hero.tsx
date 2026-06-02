@@ -6,8 +6,14 @@ import SoundWaves from "./SoundWaves";
 import Particles from "./Particles";
 import Player from "./Player";
 import AdsCarousel from "./AdsCarousel";
+import type { Slide } from "@/lib/config";
 
-export default function Hero() {
+interface HeroProps {
+  streamUrl?: string;
+  slides?: Slide[];
+}
+
+export default function Hero({ streamUrl, slides }: HeroProps) {
   return (
     <section
       id="inicio"
@@ -62,7 +68,7 @@ export default function Hero() {
 
           {/* === RIGHT COLUMN (7/12) — Player más ancho === */}
           <div className="order-1 lg:order-2 lg:col-span-7">
-            <Player />
+            <Player streamUrl={streamUrl} />
           </div>
         </div>
       </div>
@@ -100,7 +106,7 @@ export default function Hero() {
         transition={{ duration: 1, delay: 0.55 }}
         className="mt-6 w-full"
       >
-        <AdsCarousel />
+        <AdsCarousel slides={slides} />
       </motion.div>
 
       {/* === Botones CTA debajo del carrusel === */}

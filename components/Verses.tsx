@@ -32,20 +32,13 @@ const verses = [
   },
 ];
 
-export default function Verses() {
-  const [verseList, setVerseList] = useState(verses);
-  const [index, setIndex] = useState(0);
+interface VersesProps {
+  verses?: typeof verses;
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem("radio_navidad_verses");
-    if (saved) {
-      try {
-        setVerseList(JSON.parse(saved));
-      } catch (e) {
-        // Ignorar
-      }
-    }
-  }, []);
+export default function Verses({ verses: versesProp }: VersesProps) {
+  const verseList = versesProp && versesProp.length > 0 ? versesProp : verses;
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (verseList.length <= 1) return;

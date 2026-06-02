@@ -21,7 +21,7 @@ import {
   Menu,
 } from "lucide-react";
 
-// Valores por defecto para inicializar localStorage si no existen
+// Valores por defecto usados si el servidor no tiene configuración guardada
 const DEFAULT_STREAM_URL = "https://castlive.stream/8200/stream";
 
 const DEFAULT_SLIDES = [
@@ -207,36 +207,51 @@ export default function AdminDashboard() {
 
   const [notif, setNotif] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
-  // Evitar hydration errors
+  // Cargar la configuración desde el servidor (KV) al montar
   useEffect(() => {
-    setMounted(true);
-    
-    // Cargar datos de localStorage o inicializar por defecto
-    const savedStream = localStorage.getItem("radio_navidad_stream_url") || DEFAULT_STREAM_URL;
-    const savedSlides = localStorage.getItem("radio_navidad_slides");
-    const savedVerses = localStorage.getItem("radio_navidad_verses");
-    const savedPrograms = localStorage.getItem("radio_navidad_schedule");
-    const savedSocials = localStorage.getItem("radio_navidad_social_links");
-
-    setStreamUrl(savedStream);
-    setSlides(savedSlides ? JSON.parse(savedSlides) : DEFAULT_SLIDES);
-    setVerses(savedVerses ? JSON.parse(savedVerses) : DEFAULT_VERSES);
-    setPrograms(savedPrograms ? JSON.parse(savedPrograms) : DEFAULT_PROGRAMS);
-
-    if (savedSocials) {
+    (async () => {
       try {
-        setSocials(JSON.parse(savedSocials));
+        const res = await fetch("/api/config", { cache: "no-store" });
+        const cfg = await res.json();
+        setStreamUrl(cfg.streamUrl || DEFAULT_STREAM_URL);
+        setSlides(cfg.slides?.length ? cfg.slides : DEFAULT_SLIDES);
+        setVerses(cfg.verses?.length ? cfg.verses : DEFAULT_VERSES);
+        setPrograms(cfg.schedule?.length ? cfg.schedule : DEFAULT_PROGRAMS);
+        setSocials(cfg.social?.length ? cfg.social : DEFAULT_SOCIAL_CHANNELS);
       } catch (e) {
+        setStreamUrl(DEFAULT_STREAM_URL);
+        setSlides(DEFAULT_SLIDES);
+        setVerses(DEFAULT_VERSES);
+        setPrograms(DEFAULT_PROGRAMS);
         setSocials(DEFAULT_SOCIAL_CHANNELS);
+      } finally {
+        setMounted(true);
       }
-    } else {
-      setSocials(DEFAULT_SOCIAL_CHANNELS);
-    }
+    })();
   }, []);
 
   const showNotification = (text: string, type: "success" | "error" = "success") => {
     setNotif({ text, type });
     setTimeout(() => setNotif(null), 3000);
+  };
+
+  // Persiste campos parciales de la configuración en el servidor (KV)
+  const saveToServer = async (partial: Record<string, any>): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(partial),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || "Error al guardar");
+      }
+      return true;
+    } catch (err: any) {
+      showNotification(err.message || "Error al guardar en el servidor", "error");
+      return false;
+    }
   };
 
   const handleLogout = async () => {
@@ -251,10 +266,9 @@ export default function AdminDashboard() {
   };
 
   // Guardar configuración general y redes sociales
-  const saveGeneral = () => {
-    localStorage.setItem("radio_navidad_stream_url", streamUrl);
-    localStorage.setItem("radio_navidad_social_links", JSON.stringify(socials));
-    showNotification("Configuración general y redes sociales guardadas");
+  const saveGeneral = async () => {
+    const ok = await saveToServer({ streamUrl, social: socials });
+    if (ok) showNotification("Configuración general y redes sociales guardadas");
   };
 
   // Sube la imagen a Cloudinary directamente desde el navegador (sin backend)
@@ -330,7 +344,7 @@ export default function AdminDashboard() {
     xhr.send(formData);
   };
 
-  // Quita la imagen del formulario (se guarda en localStorage, no hay archivo en servidor)
+  // Quita la imagen del formulario (la URL de Cloudinary se persiste al guardar el anuncio)
   const removeUploadedImage = () => {
     setSlideImage("");
   };
@@ -363,7 +377,7 @@ export default function AdminDashboard() {
       showNotification("Anuncio agregado");
     }
     setSlides(updated);
-    localStorage.setItem("radio_navidad_slides", JSON.stringify(updated));
+    saveToServer({ slides: updated });
     setSlideTitle("");
     setSlideSubtitle("");
     setSlideTag("");
@@ -375,7 +389,7 @@ export default function AdminDashboard() {
   const deleteSlide = (idx: number) => {
     const updated = slides.filter((_, i) => i !== idx);
     setSlides(updated);
-    localStorage.setItem("radio_navidad_slides", JSON.stringify(updated));
+    saveToServer({ slides: updated });
     showNotification("Anuncio eliminado");
   };
 
@@ -405,7 +419,7 @@ export default function AdminDashboard() {
       showNotification("Versículo agregado");
     }
     setVerses(updated);
-    localStorage.setItem("radio_navidad_verses", JSON.stringify(updated));
+    saveToServer({ verses: updated });
     setVerseText("");
     setVerseRef("");
   };
@@ -413,7 +427,7 @@ export default function AdminDashboard() {
   const deleteVerse = (idx: number) => {
     const updated = verses.filter((_, i) => i !== idx);
     setVerses(updated);
-    localStorage.setItem("radio_navidad_verses", JSON.stringify(updated));
+    saveToServer({ verses: updated });
     showNotification("Versículo eliminado");
   };
 
@@ -447,7 +461,7 @@ export default function AdminDashboard() {
       showNotification("Programa agregado");
     }
     setPrograms(updated);
-    localStorage.setItem("radio_navidad_schedule", JSON.stringify(updated));
+    saveToServer({ schedule: updated });
     // Resetear inputs
     setProgTitle("");
     setProgTime("");
@@ -460,7 +474,7 @@ export default function AdminDashboard() {
   const deleteProgram = (idx: number) => {
     const updated = programs.filter((_, i) => i !== idx);
     setPrograms(updated);
-    localStorage.setItem("radio_navidad_schedule", JSON.stringify(updated));
+    saveToServer({ schedule: updated });
     showNotification("Programa eliminado");
   };
 

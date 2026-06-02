@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Facebook, Youtube, Instagram } from "lucide-react";
 import SectionHeading from "./SectionHeading";
@@ -67,19 +66,12 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Social() {
-  const [channels, setChannels] = useState<any[]>(DEFAULT_SOCIAL_CHANNELS);
+interface SocialProps {
+  channels?: any[];
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem("radio_navidad_social_links");
-    if (saved) {
-      try {
-        setChannels(JSON.parse(saved));
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, []);
+export default function Social({ channels: channelsProp }: SocialProps) {
+  const channels = channelsProp && channelsProp.length > 0 ? channelsProp : DEFAULT_SOCIAL_CHANNELS;
 
   return (
     <section id="contacto" className="relative py-24 md:py-32">
