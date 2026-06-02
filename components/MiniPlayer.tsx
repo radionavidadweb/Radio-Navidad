@@ -17,8 +17,8 @@ export default function MiniPlayer() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.a
-          href="#reproductor"
+        <motion.button
+          onClick={() => document.getElementById("reproductor")?.scrollIntoView({ behavior: "smooth" })}
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
@@ -38,7 +38,7 @@ export default function MiniPlayer() {
           <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-redGlow to-brand-redDark text-white shadow-glow">
             <ArrowUp className="h-4 w-4" />
           </div>
-        </motion.a>
+        </motion.button>
       )}
     </AnimatePresence>
   );

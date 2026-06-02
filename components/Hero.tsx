@@ -110,14 +110,23 @@ export default function Hero() {
         transition={{ duration: 0.8, delay: 0.7 }}
         className="mx-auto mt-6 flex flex-col items-center gap-3 px-5 sm:flex-row sm:justify-center sm:gap-4 md:px-8"
       >
-        <a href="#reproductor" className="btn-primary group">
+        <button
+          onClick={() => {
+            document.getElementById("reproductor")?.scrollIntoView({ behavior: "smooth" });
+            window.dispatchEvent(new CustomEvent("radio-play"));
+          }}
+          className="btn-primary group"
+        >
           <Play className="h-5 w-5" fill="currentColor" />
           Escuchar En Vivo
-        </a>
-        <a href="#programacion" className="btn-ghost">
+        </button>
+        <button
+          onClick={() => document.getElementById("programacion")?.scrollIntoView({ behavior: "smooth" })}
+          className="btn-ghost"
+        >
           <CalendarDays className="h-5 w-5" />
           Ver Programación
-        </a>
+        </button>
       </motion.div>
 
       {/* Scroll cue */}

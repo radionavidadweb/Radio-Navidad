@@ -191,6 +191,7 @@ export default function AdminDashboard() {
   const [slideGradient, setSlideGradient] = useState("from-brand-redDark via-brand-red to-rose-700");
   const [slideImage, setSlideImage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Verse inputs
   const [verseText, setVerseText] = useState("");
@@ -256,8 +257,7 @@ export default function AdminDashboard() {
     showNotification("Configuración general y redes sociales guardadas");
   };
 
-  // Elimina un archivo subido del servidor Next.js
-  // Convierte la imagen a base64 y la guarda en el estado (sin servidor)
+  // Sube la imagen a Cloudinary directamente desde el navegador (sin backend)
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -268,23 +268,66 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (file.size > 1 * 1024 * 1024) {
-      showNotification("La imagen supera 1 MB. Comprimila antes de subirla", "error");
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification("La imagen supera 5 MB. Usá una imagen más liviana", "error");
+      return;
+    }
+
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloudName || !uploadPreset) {
+      showNotification("Variables de Cloudinary no configuradas. Reiniciá el servidor.", "error");
       return;
     }
 
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setSlideImage(ev.target?.result as string);
-      showNotification("Imagen cargada con éxito");
-      setUploading(false);
+    setUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+    xhr.timeout = 120000; // 2 minutos
+
+    // Progreso real de la subida
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        setUploadProgress(Math.round((event.loaded / event.total) * 100));
+      }
     };
-    reader.onerror = () => {
-      showNotification("Error al leer la imagen", "error");
+
+    xhr.onload = () => {
       setUploading(false);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          setSlideImage(data.secure_url);
+          showNotification("Imagen subida a Cloudinary con éxito ✓");
+        } catch {
+          showNotification("Respuesta inválida de Cloudinary", "error");
+        }
+      } else {
+        let msg = "Error al subir la imagen";
+        try {
+          msg = JSON.parse(xhr.responseText)?.error?.message || msg;
+        } catch {}
+        showNotification(msg, "error");
+      }
     };
-    reader.readAsDataURL(file);
+
+    xhr.onerror = () => {
+      setUploading(false);
+      showNotification("Error de red al conectar con Cloudinary. Verificá tu conexión.", "error");
+    };
+
+    xhr.ontimeout = () => {
+      setUploading(false);
+      showNotification("Tiempo de espera agotado (2 min). Verificá tu conexión.", "error");
+    };
+
+    xhr.send(formData);
   };
 
   // Quita la imagen del formulario (se guarda en localStorage, no hay archivo en servidor)
@@ -868,9 +911,18 @@ export default function AdminDashboard() {
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                         {uploading ? (
-                          <div className="flex flex-col items-center gap-2">
-                            <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                            <span className="text-xs text-white/60">Subiendo imagen...</span>
+                          <div className="flex w-full max-w-xs flex-col items-center gap-3">
+                            <span className="text-xs font-semibold text-white/70">
+                              {uploadProgress < 100
+                                ? `Subiendo imagen... ${uploadProgress}%`
+                                : "Procesando en Cloudinary..."}
+                            </span>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red transition-all duration-200"
+                                style={{ width: `${uploadProgress}%` }}
+                              />
+                            </div>
                           </div>
                         ) : (
                           <div className="flex flex-col items-center gap-1.5">
@@ -878,7 +930,7 @@ export default function AdminDashboard() {
                               <Plus className="h-5 w-5" />
                             </div>
                             <p className="text-xs font-semibold text-white/70">Subir imagen</p>
-                            <p className="text-[10px] text-white/40">PNG, JPG, WEBP o GIF · Máx. 1 MB (Recomendado 16:9)</p>
+                            <p className="text-[10px] text-white/40">PNG, JPG, WEBP o GIF · Máx. 5 MB (Recomendado 16:9)</p>
                           </div>
                         )}
                       </div>
@@ -911,7 +963,7 @@ export default function AdminDashboard() {
                     <p className="text-[10px] text-white/45 leading-relaxed bg-white/[0.01] border border-white/5 rounded-xl p-3 flex items-start gap-2">
                       <span className="text-xs text-brand-redGlow">💡</span>
                       <span>
-                        <strong className="text-white/60">Sugerencia técnica:</strong> Usá imágenes en formato <strong className="text-white/60">16:9</strong> (resolución recomendada: <strong className="text-white/60">1280x720</strong> o <strong className="text-white/60">960x540 px</strong>). La imagen se guarda en el navegador, por eso el archivo debe pesar menos de <strong className="text-white/60">1 MB</strong> (preferí WebP o JPG optimizado).
+                        <strong className="text-white/60">Sugerencia técnica:</strong> Usá imágenes en formato <strong className="text-white/60">16:9</strong> (resolución recomendada: <strong className="text-white/60">1280x720</strong> o <strong className="text-white/60">960x540 px</strong>). Las imágenes se almacenan en <strong className="text-white/60">Cloudinary</strong> y persisten entre deploys. Máximo <strong className="text-white/60">5 MB</strong> (preferí WebP o JPG optimizado).
                       </span>
                     </p>
                   </div>

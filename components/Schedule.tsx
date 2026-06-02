@@ -144,12 +144,12 @@ export default function Schedule() {
                       />
                     ))}
                   </div>
-                  <a
-                    href="#reproductor"
+                  <button
+                    onClick={() => document.getElementById("reproductor")?.scrollIntoView({ behavior: "smooth" })}
                     className="text-[11px] font-semibold uppercase tracking-wider text-white/55 transition-colors group-hover:text-brand-redGlow"
                   >
                     Escuchar →
-                  </a>
+                  </button>
                 </div>
 
                 {/* Hover glow */}

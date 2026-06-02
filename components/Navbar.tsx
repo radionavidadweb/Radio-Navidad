@@ -6,12 +6,17 @@ import { Menu, X, Radio } from "lucide-react";
 import Image from "next/image";
 
 const links = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Nosotros", href: "#nosotros" },
-  { label: "Programación", href: "#programacion" },
-  { label: "Versículos", href: "#versiculos" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Inicio",       id: "inicio" },
+  { label: "Nosotros",     id: "nosotros" },
+  { label: "Programación", id: "programacion" },
+  { label: "Versículos",   id: "versiculos" },
+  { label: "Contacto",     id: "contacto" },
 ];
+
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  history.pushState(null, "", `/${id}`);
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -36,7 +41,7 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-        {/* Logo */}
+        {/* Logo — recarga la página */}
         <a href="/" className="group flex items-center gap-3">
           <div className="relative h-11 w-11 overflow-hidden rounded-full ring-2 ring-brand-red/40 shadow-glow transition-transform group-hover:scale-105">
             <Image
@@ -61,13 +66,13 @@ export default function Navbar() {
         {/* Desktop links */}
         <ul className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
-            <li key={l.href}>
-              <a
-                href={l.href}
+            <li key={l.id}>
+              <button
+                onClick={() => scrollTo(l.id)}
                 className="relative rounded-full px-4 py-2 text-sm font-medium text-white/75 transition-colors hover:text-white"
               >
                 {l.label}
-              </a>
+              </button>
             </li>
           ))}
         </ul>
@@ -75,7 +80,7 @@ export default function Navbar() {
         {/* CTA */}
         <button
           onClick={() => {
-            document.getElementById("reproductor")?.scrollIntoView({ behavior: "smooth" });
+            scrollTo("reproductor");
             window.dispatchEvent(new CustomEvent("radio-play"));
           }}
           className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all hover:scale-[1.03] md:inline-flex"
@@ -107,24 +112,26 @@ export default function Navbar() {
             <div className="mx-4 mb-3 rounded-3xl glass-strong p-5">
               <ul className="flex flex-col gap-1">
                 {links.map((l) => (
-                  <li key={l.href}>
-                    <a
-                      href={l.href}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-2xl px-4 py-3 text-base text-white/85 transition hover:bg-white/10 hover:text-white"
+                  <li key={l.id}>
+                    <button
+                      onClick={() => { scrollTo(l.id); setOpen(false); }}
+                      className="block w-full rounded-2xl px-4 py-3 text-left text-base text-white/85 transition hover:bg-white/10 hover:text-white"
                     >
                       {l.label}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
-              <a
-                href="#reproductor"
-                onClick={() => setOpen(false)}
-                className="mt-3 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red px-5 py-3 text-sm font-semibold text-white shadow-glow"
+              <button
+                onClick={() => {
+                  scrollTo("reproductor");
+                  window.dispatchEvent(new CustomEvent("radio-play"));
+                  setOpen(false);
+                }}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-redGlow to-brand-red px-5 py-3 text-sm font-semibold text-white shadow-glow"
               >
                 <Radio className="h-4 w-4" /> Escuchar En Vivo
-              </a>
+              </button>
             </div>
           </motion.div>
         )}
