@@ -3,8 +3,9 @@ import AdminDashboard from "@/components/AdminDashboard";
 import AdminLogin from "@/components/AdminLogin";
 
 export const metadata = {
-  title: "Panel Administrativo · Radio Navidad",
+  title: "Panel Administrativo",
   description: "Acceso exclusivo para administradores de Radio Navidad.",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminPage() {

@@ -122,11 +122,6 @@ export default function Player({ streamUrl }: PlayerProps) {
             <span className="live-dot" />
             En Vivo
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-white/55">
-            <span>FM 98.7</span>
-            <span className="h-1 w-1 rounded-full bg-white/30" />
-            <span>Stream HD · 320kbps</span>
-          </div>
         </div>
 
         <div className="flex flex-row items-center gap-3 md:gap-4 md:items-stretch">

@@ -181,7 +181,11 @@ export default function AdsCarousel({ slides: slidesProp }: AdsCarouselProps) {
                 {s.image && (
                   <img
                     src={s.image}
-                    alt=""
+                    alt={
+                      [s.title, s.subtitle, s.tag].filter(Boolean).join(" — ") ||
+                      "Anuncio en Radio Navidad"
+                    }
+                    loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 )}
