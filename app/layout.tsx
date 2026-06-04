@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,6 +44,14 @@ export const metadata: Metadata = {
   publisher: "Radio Navidad",
   alternates: {
     canonical: "/",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Radio Navidad",
+  },
+  verification: {
+    google: "Ro243iluq6rUDSWMcpbZ3YrTFnBPKUTyxSktgVWyg-0",
   },
   robots: {
     index: true,
@@ -92,7 +101,11 @@ export default function RootLayout({
 
   return (
     <html lang="es" className={`${inter.variable} ${display.variable}`}>
+      <head>
+        <link rel="apple-touch-icon" href="/logo-radio-navidad.jpg" />
+      </head>
       <body className="font-sans antialiased">
+        <ServiceWorkerRegistration />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
