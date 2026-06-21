@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://christmasradionavidad.com"
   ),
   title: {
     default: "Radio Navidad",
@@ -91,7 +91,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "RadioStation",
     name: "Radio Navidad",
-    url: process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000",
+    url: process.env.NEXT_PUBLIC_BASE_URL ?? "https://christmasradionavidad.com",
     logo: "/logo-radio-navidad.jpg",
     image: "/banner-radio-navidad.jpg",
     description:

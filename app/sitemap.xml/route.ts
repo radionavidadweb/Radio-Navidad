@@ -2,7 +2,8 @@ import { getConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL ?? "https://christmasradionavidad.com";
 
 function escapeXml(value: string): string {
   return value
